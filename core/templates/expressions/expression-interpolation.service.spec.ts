@@ -132,4 +132,45 @@ describe('expression interpolation service', () => {
       expressionInterpolationService.getParamsFromString('abc{{a+b}}')
     ).toEqual(['a', 'b']);
   });
+
+  // New test cases for better coverage
+  it('should throw an error for unexpected exceptions in processHtml', () => {
+    spyOn(expressionInterpolationService['htmlEscaperService'], 'unescapedStrToEscapedStr').and.throwError(
+      'UnexpectedError'
+    );
+
+    expect(() => {
+      expressionInterpolationService.processHtml('<div>{{value}}</div>', [{ value: 'test' }]);
+    }).toThrowError('UnexpectedError');
+  });
+
+  it('should throw an error for unexpected exceptions in processUnicode', () => {
+    spyOn(expressionInterpolationService['expressionEvaluatorService'], 'evaluateExpression').and.throwError(
+      'UnexpectedError'
+    );
+
+    expect(() => {
+      expressionInterpolationService.processUnicode('{{value}}', [{ value: 'test' }]);
+    }).toThrowError('UnexpectedError');
+  });
+
+  it('should handle null inputs in processHtml', () => {
+    expect(expressionInterpolationService.processHtml(null, [{}])).toEqual(null);
+    expect(expressionInterpolationService.processHtml('', [{}])).toEqual('');
+  });
+  
+  it('should handle null inputs in processUnicode', () => {
+    expect(expressionInterpolationService.processUnicode(null, [{}])).toEqual(null);
+    expect(expressionInterpolationService.processUnicode('', [{}])).toEqual('');
+  });
+
+
+  it('should handle else path in getParamsFromString', () => {
+    spyOn(expressionInterpolationService['expressionSyntaxTreeService'], 'getParamsUsedInExpression').and.returnValue(
+      ['param1']
+    );
+
+    const result = expressionInterpolationService.getParamsFromString('abc{{param1}}');
+    expect(result).toEqual(['param1']);
+  });
 });

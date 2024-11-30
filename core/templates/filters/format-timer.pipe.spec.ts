@@ -34,4 +34,37 @@ describe('Testing FormatTimePipe', () => {
     expect(pipe.transform(556)).toEqual('09:16');
     expect(pipe.transform(243)).toEqual('04:03');
   });
+
+  it('should format time for single-digit seconds correctly', () => {
+    expect(pipe.transform(9)).toEqual('00:09');
+  });
+
+  it('should format time for exactly one minute', () => {
+    expect(pipe.transform(60)).toEqual('01:00');
+  });
+
+  it('should format time for exactly one hour', () => {
+    expect(pipe.transform(3600)).toEqual('60:00');
+  });
+
+  it('should format time for zero input', () => {
+    expect(pipe.transform(0)).toEqual('00:00');
+  });
+
+  it('should format time for large values', () => {
+    expect(pipe.transform(9999)).toEqual('166:39');
+  });
+
+  
+  //Mock
+  it('should call formatNum function twice when formatting time', () => {
+    const formatNumSpy = spyOn<any>(pipe, 'transform').and.callThrough();
+  
+    const result = pipe.transform(123); // 2 minutes and 3 seconds
+    expect(result).toEqual('02:03');
+  
+    // Ensure the mocked function was invoked twice (once for minutes, once for seconds)
+    expect(formatNumSpy).toHaveBeenCalled();
+  });
+  
 });

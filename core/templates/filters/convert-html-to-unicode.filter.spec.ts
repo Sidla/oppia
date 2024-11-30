@@ -30,9 +30,9 @@ describe('HTML to text', function () {
       'oppia',
       function ($provide: {value: (arg0: string, arg1: string) => void}) {
         var ugs = new UpgradedServices();
-        for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
           $provide.value(key, value as string);
-        }
+    }
       }
     )
   );
@@ -53,6 +53,38 @@ describe('HTML to text', function () {
       htmlUnicodeHtmlPairings.forEach(function (pairing) {
         expect($filter('convertHtmlToUnicode')(pairing[0])).toEqual(pairing[1]);
       });
-    })
-  );
+    }
+  ));
+
+  // Basic Unit Tests
+
+  it('should handle empty HTML strings correctly', angular.mock.inject(function ($filter) {
+    const result = $filter('convertHtmlToUnicode')('');
+    expect(result).toEqual('');
+  }));
+
+  it('should handle HTML with special characters', angular.mock.inject(function ($filter) {
+    const inputHtml = '<div>©®™</div>';
+    const result = $filter('convertHtmlToUnicode')(inputHtml);
+    expect(result).toEqual('©®™');
+  }));
+
+  it('should convert HTML entity for &lt;', angular.mock.inject(function ($filter) {
+    const inputHtml = '&lt;div&gt;';
+    const result = $filter('convertHtmlToUnicode')(inputHtml);
+    expect(result).toEqual('<div>');
+  }));
+
+  it('should convert HTML entity for &gt;', angular.mock.inject(function ($filter) {
+    const inputHtml = '&gt;div&lt;';
+    const result = $filter('convertHtmlToUnicode')(inputHtml);
+    expect(result).toEqual('>div<');
+  }));
+
+  it('should return the same value for plain text without HTML', angular.mock.inject(function ($filter) {
+    const inputText = 'plain text';
+    const result = $filter('convertHtmlToUnicode')(inputText);
+    expect(result).toEqual(inputText);
+  }));
+
 });
